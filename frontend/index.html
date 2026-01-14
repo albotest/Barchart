@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Financial Charting Platform - Real-Time Stock & Futures Charts</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body class="flex flex-col h-screen bg-barchart-bg text-barchart-text overflow-hidden">
+
+    <!-- HOME VIEW -->
+    <div id="home-view" class="h-full flex flex-col bg-gray-50 overflow-auto">
+        <!-- Home Header -->
+        <!-- Home Header -->
+        <header
+            class="bg-[#0b1e3b] text-white px-4 py-3 flex items-center shadow-md shrink-0 relative justify-center h-16">
+            <!-- Center: Logo -->
+            <div class="font-bold text-3xl tracking-tight">
+                <span class="text-blue-400">bar</span>chart
+            </div>
+        </header>
+
+        <!-- (Removed Market Overview Ticker Strip) -->
+
+        <!-- Hero / Content Placeholder -->
+        <div class="flex-1 p-8 max-w-7xl mx-auto w-full">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Markets Today</h1>
+            <p class="text-gray-600 mb-8">Real-time data and charts for the world's leading markets.</p>
+
+            <!-- Market Data Grid -->
+            <div id="market-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Market Cards will be injected here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/home.js"></script>
+</body>
+
+</html>

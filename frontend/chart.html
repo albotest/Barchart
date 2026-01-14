@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Financial Charting Platform - Real-Time Stock & Futures Charts</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body class="flex flex-col h-screen bg-barchart-bg text-barchart-text overflow-hidden">
+
+    <!-- CHART VIEW (Always Visible) -->
+    <div id="chart-view" class="h-full flex flex-col relative w-full">
+        <!-- 1. Top Navigation Bar -->
+        <header class="h-12 border-b border-barchart-border flex items-center px-2 shadow-sm bg-white shrink-0 z-10">
+            <!-- Back to Home -->
+            <button id="back-to-home-btn"
+                class="mr-4 text-blue-900 font-bold text-xl hover:opacity-80 flex items-center" title="Back to Home">
+                <span class="text-blue-500">bar</span>chart
+            </button>
+
+            <!-- Market Name Display -->
+            <div id="market-name-display" class="font-bold text-xl text-gray-800 mr-6"></div>
+
+            <!-- Symbol Search -->
+            <div class="relative flex items-center mr-4">
+                <i class="fa-solid fa-magnifying-glass absolute left-2 text-gray-400 text-sm"></i>
+                <input type="text" id="symbol-search" placeholder="Symbol..."
+                    class="pl-8 pr-2 py-1 bg-gray-100 border border-transparent focus:border-blue-400 rounded text-sm w-32 focus:bg-white transition-colors outline-none"
+                    value="NQH26">
+            </div>
+
+            <!-- Timeframe Dropdown (Daily) -->
+            <div class="flex items-center space-x-4 text-sm font-medium text-gray-700">
+                <div class="relative group cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
+                    <span id="timeframe-display">Daily</span> <i class="fa-solid fa-caret-down text-xs ml-1"></i>
+                    <!-- Dropdown -->
+                    <div
+                        class="hidden group-hover:block absolute top-full left-0 bg-white border border-gray-200 shadow-lg rounded w-40 z-50 py-1">
+
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({interval: '5m'})">5 Minutes</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({interval: '15m'})">15 Minutes</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({interval: '30m'})">30 Minutes</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({interval: '1h'})">1 Hour</div>
+                        <div class="border-t my-1"></div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer font-bold"
+                            onclick="window.setParams({interval: '1d'})">Daily</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({interval: '1wk'})">Weekly</div>
+
+                    </div>
+                </div>
+
+                <!-- Period Dropdown -->
+                <div class="relative group cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
+                    <span id="period-display">6-Month</span> <i class="fa-solid fa-caret-down text-xs ml-1"></i>
+                    <div
+                        class="hidden group-hover:block absolute top-full left-0 bg-white border border-gray-200 shadow-lg rounded w-40 z-50 py-1">
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({period: '1mo'})">1-Month</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({period: '3mo'})">3-Month</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer font-bold"
+                            onclick="window.setParams({period: '6mo'})">6-Month</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({period: '1y'})">1-Year</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setParams({period: '5y'})">5-Year</div>
+                    </div>
+                </div>
+
+                <!-- Chart Type Dropdown -->
+                <div class="relative group cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
+                    <span id="chart-type-display">H</span> <i class="fa-solid fa-caret-down text-xs ml-1"></i>
+                    <div
+                        class="hidden group-hover:block absolute top-full left-0 bg-white border border-gray-200 shadow-lg rounded w-40 z-50 py-1">
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setChartType('Candlestick')">Candlestick</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer" onclick="window.setChartType('Bar')">OHLC
+                            Bars</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer" onclick="window.setChartType('Line')">
+                            Line</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer" onclick="window.setChartType('Area')">
+                            Area</div>
+                        <div class="px-3 py-1 hover:bg-blue-50 cursor-pointer"
+                            onclick="window.setChartType('Heikin Ashi')">Heikin Ashi</div>
+                    </div>
+                </div>
+
+                <!-- Indicators Button -->
+                <button id="indicators-btn" class="hover:bg-gray-100 px-2 py-1 rounded">
+                    Indicators
+                </button>
+
+                <!-- Compare Button -->
+                <button id="compare-btn" class="hover:bg-gray-100 px-2 py-1 rounded">
+                    Compare
+                </button>
+
+                <!-- f(x) -->
+                <button class="hover:bg-gray-100 px-2 py-1 rounded">
+                    f(x)
+                </button>
+            </div>
+
+            <div class="flex-grow"></div>
+
+            <!-- Right Utilities -->
+            <div class="flex items-center space-x-3 text-gray-500 text-lg">
+                <button class="hover:text-blue-500"><i class="fa-regular fa-share-from-square"></i></button>
+                <button class="hover:text-blue-500"><i class="fa-solid fa-plus-circle"></i></button>
+                <button class="hover:text-blue-500"><i class="fa-solid fa-circle-info"></i></button>
+                <button class="hover:text-blue-500 text-sm flex items-center">Actions <i
+                        class="fa-solid fa-caret-down ml-1 text-xs"></i></button>
+                <button class="hover:text-blue-500"><i class="fa-regular fa-question-circle"></i></button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="flex flex-1 overflow-hidden relative">
+
+            <!-- 2. Left Sidebar (Drawing Tools) -->
+            <aside
+                class="w-12 border-r border-barchart-border flex flex-col items-center py-2 space-y-2 shadow-sm z-20 bg-white select-none">
+
+                <!-- Cursor Tools -->
+                <div class="relative group w-full flex justify-center">
+                    <button class="text-gray-500 hover:text-blue-500 p-2 rounded hover:bg-gray-50 transition"
+                        title="Crosshair">
+                        <i class="fa-solid fa-crosshairs"></i>
+                    </button>
+                    <!-- Popover -->
+                    <div
+                        class="absolute left-full top-0 ml-1 bg-white border border-gray-200 shadow-lg rounded hidden group-hover:block z-50 w-40 p-1">
+                        <div class="text-xs font-semibold text-gray-400 mb-1 px-2">CURSOR</div>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode(null)">
+                            <i class="fa-solid fa-crosshairs w-4"></i> Crosshair
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode(null)">
+                            <i class="fa-solid fa-arrow-pointer w-4"></i> Arrow
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-8 border-t"></div>
+
+                <!-- Line Tools Group -->
+                <div class="relative group w-full flex justify-center">
+                    <button class="text-gray-500 hover:text-blue-500 p-2 rounded hover:bg-gray-50 transition"
+                        title="Trend Line Tools">
+                        <i class="fa-solid fa-slash"></i>
+                    </button>
+                    <div
+                        class="absolute left-full top-0 ml-1 bg-white border border-gray-200 shadow-lg rounded hidden group-hover:block z-50 w-48 p-1">
+                        <div class="text-xs font-semibold text-gray-400 mb-1 px-2">LINES</div>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Trendline')">
+                            <i class="fa-solid fa-slash w-4"></i> Trend Line
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Ray')">
+                            <i class="fa-solid fa-arrow-right-long w-4"></i> Ray
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('HorizontalLine')">
+                            <i class="fa-solid fa-minus w-4"></i> Horizontal Line
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('VerticalLine')">
+                            <i class="fa-solid fa-grip-lines-vertical w-4"></i> Vertical Line
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Geometric Shapes Group -->
+                <div class="relative group w-full flex justify-center">
+                    <button class="text-gray-500 hover:text-blue-500 p-2 rounded hover:bg-gray-50 transition"
+                        title="Geometric Shapes">
+                        <i class="fa-regular fa-square"></i>
+                    </button>
+                    <div
+                        class="absolute left-full top-0 ml-1 bg-white border border-gray-200 shadow-lg rounded hidden group-hover:block z-50 w-48 p-1">
+                        <div class="text-xs font-semibold text-gray-400 mb-1 px-2">SHAPES</div>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Rectangle')">
+                            <i class="fa-regular fa-square w-4"></i> Rectangle
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Ellipse')">
+                            <i class="fa-regular fa-circle w-4"></i> Ellipse
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Channel')">
+                            <i class="fa-solid fa-bars w-4"></i> Parallel Channel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Text Group -->
+                <div class="relative group w-full flex justify-center">
+                    <button class="text-gray-500 hover:text-blue-500 p-2 rounded hover:bg-gray-50 transition"
+                        title="Text Tools">
+                        <i class="fa-solid fa-font"></i>
+                    </button>
+                    <div
+                        class="absolute left-full top-0 ml-1 bg-white border border-gray-200 shadow-lg rounded hidden group-hover:block z-50 w-40 p-1">
+                        <div class="text-xs font-semibold text-gray-400 mb-1 px-2">TEXT</div>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Text')">
+                            <i class="fa-solid fa-font w-4"></i> Text
+                        </button>
+                        <button
+                            class="w-full text-left px-2 py-1.5 hover:bg-gray-100 text-sm text-gray-700 rounded flex items-center gap-2"
+                            onclick="window.chartManager.setDrawingMode('Callout')">
+                            <i class="fa-regular fa-comment w-4"></i> Callout
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-8 border-t"></div>
+
+                <!-- Utilities -->
+                <button class="text-gray-500 hover:text-blue-500 p-2 rounded hover:bg-gray-50 transition"
+                    title="Magnet Mode" onclick="this.classList.toggle('text-blue-600')">
+                    <i class="fa-solid fa-magnet"></i>
+                </button>
+                <button class="text-gray-500 hover:text-blue-500 p-2 rounded hover:bg-gray-50 transition"
+                    title="Lock All Drawings" onclick="this.classList.toggle('text-blue-600')">
+                    <i class="fa-solid fa-lock"></i>
+                </button>
+                <button class="text-gray-500 hover:text-red-500 p-2 rounded hover:bg-gray-50 transition"
+                    title="Delete All Drawings" onclick="window.chartManager.clearDrawings()">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+
+            </aside>
+
+            <!-- Main Chart Container -->
+            <main class="flex-1 flex flex-col relative" id="chart-wrapper">
+                <!-- Quote Header -->
+                <div class="bg-white px-4 py-3 border-b shrink-0">
+                    <!-- Title Row -->
+                    <div class="flex items-center justify-between mb-1">
+                        <h1 class="text-2xl font-bold text-gray-900" id="quote-name">--</h1>
+                    </div>
+
+                    <!-- Price Row -->
+                    <div class="flex items-center gap-4 mb-2">
+                        <!-- Main Price -->
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-bold text-gray-900" id="quote-price">--</span>
+                            <div class="flex items-center px-2 py-0.5 rounded text-lg font-bold"
+                                id="quote-change-container">
+                                <span id="quote-change">--</span>
+                                <span class="ml-1" id="quote-percent">(--%)</span>
+                            </div>
+                        </div>
+
+                        <!-- Time -->
+                        <div class="text-sm text-gray-500 font-mono" id="quote-time">--:-- CT [COMEX]</div>
+                    </div>
+
+                    <!-- Bid/Ask Row -->
+                    <div class="flex items-center gap-3 text-sm font-mono mb-3">
+                        <div class="bg-green-100 text-green-800 px-2 py-0.5 rounded border border-green-200"
+                            id="quote-bid">
+                            -- x --
+                        </div>
+                        <div class="bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200" id="quote-ask">
+                            -- x --
+                        </div>
+
+                    </div>
+
+                    <!-- Quote Overview Header -->
+                    <div class="text-xs uppercase font-bold text-gray-800 tracking-wide">
+                        QUOTE OVERVIEW for <span id="quote-date">--</span>
+                    </div>
+                </div>
+
+                <!-- Indicators Display -->
+                <div id="indicators-display"
+                    class="hidden flex-wrap items-center gap-x-6 gap-y-1 px-4 py-1 border-b bg-gray-50 text-xs font-mono text-gray-600 min-h-[26px]">
+                    <!-- Injected via JS -->
+                </div>
+
+                <!-- Chart Div -->
+                <div id="chart-container" class="w-full h-full"></div>
+
+                <!-- Bottom Time Navigation -->
+                <div
+                    class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 rounded shadow-md flex items-center px-1 py-1 z-20 text-xs">
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: '1d'})">1D</button>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: '5d'})">5D</button>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: '1mo'})">1M</button>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: '3mo'})">3M</button>
+                    <button class="px-2 py-1 bg-blue-100 text-blue-700 font-bold rounded"
+                        onclick="window.setParams({period: '6mo'})">6M</button>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: '1y'})">1Y</button>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: '5y'})">5Y</button>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"
+                        onclick="window.setParams({period: 'max'})">Max</button>
+                    <div class="border-l mx-1 h-4"></div>
+                    <button class="px-2 py-1 hover:bg-gray-100 rounded"><i class="fa-regular fa-calendar"></i></button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals (Hidden by default) -->
+    <div id="indicator-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center font-sans">
+        <div class="bg-white rounded-lg shadow-xl w-[600px] h-[500px] flex flex-col">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="font-bold text-lg hidden">Indicators</h3> <!-- Hidden as per user request -->
+                <div class="flex-grow text-lg font-semibold text-gray-700">Indicators <span
+                        class="text-xs font-normal text-gray-400 ml-2">(Select to add)</span></div>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="p-4 border-b bg-gray-50">
+                <div class="relative">
+                    <i
+                        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="indicator-search" placeholder="Search Indicators"
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
+                </div>
+            </div>
+
+            <!-- Active Indicators (Chips) -->
+            <div id="active-indicators-list" class="flex flex-wrap gap-2 p-2 px-4 min-h-[40px] border-b">
+                <!-- Chips injected here -->
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b text-sm font-medium text-gray-600 bg-gray-50">
+                <button class="flex-1 py-2 text-center border-b-2 border-blue-600 text-blue-600 active-tab"
+                    data-tab="overlay">Overlay Studies</button>
+                <button class="flex-1 py-2 text-center border-b-2 border-transparent hover:text-gray-800"
+                    data-tab="standalone">Standalone Studies</button>
+            </div>
+
+            <!-- List -->
+            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <ul id="overlay-studies-list" class="space-y-1">
+                    <!-- Items injected here -->
+                </ul>
+                <ul id="standalone-studies-list" class="space-y-1 hidden">
+                    <!-- Items injected here -->
+                </ul>
+            </div>
+
+            <div class="p-4 border-t flex justify-end bg-gray-50">
+                <button id="apply-btn"
+                    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition shadow-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Config Modal -->
+    <div id="indicator-config-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center font-sans">
+        <div class="bg-white rounded-lg shadow-xl w-[400px] flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="config-modal-title" class="font-bold text-lg">Configure Indicator</h3>
+                <button id="close-config-modal-btn" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-4 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <div class="text-sm text-gray-500 mb-2">Configure parameters for this indicator.</div>
+
+                <!-- Dynamic Inputs -->
+                <div id="config-inputs-container" class="space-y-4">
+                    <!-- Injected via JS -->
+                </div>
+
+                <!-- Style Section (Placeholder for now, can be expanded) -->
+                <div class="border-t pt-4 mt-4">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">Style</h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm">Color:</span>
+                            <input type="color" id="config-color" value="#2962FF" class="h-6 w-8 p-0 border-0">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm">Width:</span>
+                            <select id="config-linewidth" class="border rounded text-sm p-1">
+                                <option value="1">1px</option>
+                                <option value="2">2px</option>
+                                <option value="3">3px</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t flex justify-end space-x-2 bg-gray-50">
+                <button id="cancel-config-btn"
+                    class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 transition">Cancel</button>
+                <button id="apply-config-btn"
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition shadow-sm">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/chart-page.js"></script>
+</body>
+
+</html>
+```
